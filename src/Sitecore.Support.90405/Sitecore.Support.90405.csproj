@@ -47,8 +47,8 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Sitecore.Zip, Version=11.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Sitecore.Zip.dll</HintPath>
+      <HintPath>..\packages\SC.Sitecore.Zip.9.0.2\lib\Sitecore.Zip.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
