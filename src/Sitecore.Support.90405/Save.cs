@@ -6,7 +6,7 @@ using System.Web;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.IO;
-using Sitecore.Support.Resources.Media;
+using Sitecore.Resources.Media;
 using Sitecore.SecurityModel;
 using Sitecore.Web;
 using Sitecore.Zip;
@@ -47,13 +47,7 @@ namespace Sitecore.Support.Pipelines.Upload
                                 string filename = this.UploadToFile(args, httpPostedFile);
                                 if (i == 0)
                                 {
-                                    #region Support.527357
-                                    
-                                    // Zadli 14th March 2019. Made changes to fix Ticket #527357
-                                    //args.Properties["filename"] = FileHandle.GetFileHandle(filename);
-                                    args.Properties[filename] = FileHandle.GetFileHandle(filename);
-                                    
-                                    #endregion
+                                    args.Properties["filename"] = FileHandle.GetFileHandle(filename);
                                 }
                             }
                         }
@@ -81,6 +75,24 @@ namespace Sitecore.Support.Pipelines.Upload
                             });
                             foreach (MediaUploadResult current in list)
                             {
+                                #region Support.527357
+                                // Zadli 14th March 2019. Made changes to fix Ticket #527357
+
+                                // There is a bug in the system where the workflow state is not set when overwriting media items.
+                                // Hence, here we start the workflow state.
+                                if (mediaUploader.Overwrite)
+                                {
+                                    var workflowId = current.Item.Fields[Sitecore.FieldIDs.DefaultWorkflow].Value;
+                                    // Make sure start the workflow when it is not empty
+                                    if (!String.IsNullOrEmpty(workflowId))
+                                    {
+                                        var workflow = Context.ContentDatabase.WorkflowProvider.GetWorkflow(workflowId);
+                                        workflow.Start(current.Item);
+                                    }
+                                }
+
+                                #endregion
+
                                 this.ProcessItem(args, current.Item, current.Path);
                             }
                         }
